@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+  <EditTextPreference android:key="username" android:title="@string/titleUsername"
+    android:summary="@string/summaryUsername" />
+  <EditTextPreference android:key="password" android:title="@string/titlePassword"
+    android:summary="@string/summaryPassword"
+    android:password="true" />
+  <EditTextPreference android:key="apiroot"  android:title="@string/titleApiroot"
+    android:summary="@string/summaryApiroot"
+	android:defaultValue="http://yamba.marakana.com/api" />
+  <ListPreference	  android:key="provider" android:title="@string/titleProvider"
+    android:summary="@string/summaryProvider" 
+    android:entries="@array/providers"
+    android:entryValues="@array/providerValues" />
+  <ListPreference	  android:key="interval" android:title="@string/titleUpdaterInterval"
+    android:summary="@string/summaryUpdaterInterval"
+    android:entries="@array/interval"
+    android:entryValues="@array/intervalValues" />
+</PreferenceScreen>
