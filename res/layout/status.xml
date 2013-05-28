@@ -21,7 +21,7 @@
   <EditText  android:id="@+id/editText"  android:hint="@string/hintText"
     android:layout_width="match_parent"  android:layout_height="0px"
     android:layout_weight="1"   
-    android:gravity="top|center_horizontal"  android:background="#cfff" />
+    android:gravity="top|center_horizontal"  android:background="#c0df" /> <!-- #cfff -->
   
   <!-- Update Button -->
   <Button  android:id="@+id/buttonUpdate"  android:text="@string/buttonUpdate"
