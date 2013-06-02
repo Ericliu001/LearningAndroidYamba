@@ -35,10 +35,12 @@ public class BaseActivity extends Activity { //
   }
 
   // Called only once first time menu is clicked on
+  // for Android 3.0 and higher, called when starting the activity
   @Override
   public boolean onCreateOptionsMenu(Menu menu) { // 
-    getMenuInflater().inflate(R.menu.menu, menu);
-    return super.onCreateOptionsMenu(menu); // better than: return true;
+	super.onCreateOptionsMenu(menu); // ref doc says call base implementation
+	getMenuInflater().inflate(R.menu.menu, menu);
+    return true; // true for the menu to be displayed
   }
 
   // Called every time user clicks on a menu item
@@ -123,7 +125,9 @@ public class BaseActivity extends Activity { //
   
   // Called every time menu is opened
   @Override
-  public boolean onMenuOpened(int featureId, Menu menu) { // 
+  public boolean onPrepareOptionsMenu(Menu menu) {
+  //public boolean onMenuOpened(int featureId, Menu menu) { // menu in argument is null when running in Nexus4 4.2.2
+	super.onPrepareOptionsMenu(menu); // ref doc says call base implementation
     MenuItem toggleItem = menu.findItem(R.id.itemToggleService); // 
     if (yamba.isServiceRunning()) { // 
       toggleItem.setTitle(R.string.titleServiceStop);
@@ -132,7 +136,7 @@ public class BaseActivity extends Activity { //
       toggleItem.setTitle(R.string.titleServiceStart);
       toggleItem.setIcon(android.R.drawable.ic_media_play);
     }
-    return true;
+    return true; // true for the menu to be displayed
   }
 
 }

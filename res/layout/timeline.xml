@@ -9,8 +9,8 @@
     android:layout_margin="10dp" android:text="@string/titleTimeline"
     android:textColor="#fff" android:textSize="30sp" />
 
-  <ListView android:layout_height="fill_parent"
-    android:layout_width="fill_parent" android:id="@+id/listTimeline"
+  <ListView android:layout_height="match_parent"
+    android:layout_width="match_parent" android:id="@+id/listTimeline"
     android:background="#6000" />
   
   <!-- Text output wrapper

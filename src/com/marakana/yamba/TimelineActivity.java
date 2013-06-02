@@ -57,8 +57,10 @@ public class TimelineActivity extends BaseActivity
 	    receiver = new TimelineReceiver();
 	    filter = new IntentFilter( UpdaterIntentService.NEW_STATUS_INTENT );
 
-	    // initialize loader, //TODO need to be prepared to handle onLoadFinished() loader callback, per docs
-	    getLoaderManager().initLoader(0, null, this);
+	    // Initialize loader cursor
+	    //  set up adapter for listview first
+	    this.setupList();
+	    getLoaderManager().initLoader(1, null, this); //must be prepared to handle onLoadFinished() loadercallback per the reference doc
 
 	    // Connect to database
 	    //dbHelper = new DbHelper(this);  // 
@@ -79,7 +81,11 @@ public class TimelineActivity extends BaseActivity
 	    super.onResume();
 	    
 	    // Setup List
-	    this.setupList();
+	    //this.setupList();
+
+	    // clk: If new update came in while receiver was unregistered, e.g. if still on Status Update screen
+	    //  restartLoader() would not called in onReceived(). So also need to load any fresh data here.
+	    getLoaderManager().restartLoader(1, null, this);
 
 	    // Register the receiver
 	    registerReceiver(receiver, filter, SEND_TIMELINE_NOTIFICATIONS, null);   //
@@ -120,18 +126,16 @@ public class TimelineActivity extends BaseActivity
 
 	  // Responsible for fetching data and setting up the list and the adapter
 	  private void setupList() { // 
-	    // Get the data
-//	    cursor = yamba.getStatusData().getStatusUpdates();
-//	    startManagingCursor(cursor); // clk: deprecated, use CursorLoader instead
-	    	// see android.app.LoaderManager reference
-	    	// and use 'standard constructor' signature for SimpleCursorAdapter()
+	    /*  use LoaderManager and CursorLoader instead
+		// Get the data
+	    //cursor = yamba.getStatusData().getStatusUpdates();
+	    //startManagingCursor(cursor); // clk: deprecated, use CursorLoader instead
+	    */
 	    // Setup Adapter
-	    // 	need sdk 11 to use new signature SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO, 0)
-//	    adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO); // deprecated in sdk 11
 		adapter = new SimpleCursorAdapter(this, R.layout.row, null, FROM, TO, 0);
+		//adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO); //deprecated in sdk 11
 	    adapter.setViewBinder(VIEW_BINDER); // 
 	    listTimeline.setAdapter(adapter);
-	    getLoaderManager().restartLoader(0, null, timelineActivity);
 	  }
 	  
 	  // View binder constant to inject business logic that converts a timestamp to
@@ -158,21 +162,25 @@ public class TimelineActivity extends BaseActivity
 	  class TimelineReceiver extends BroadcastReceiver { // 
 		  @Override
 		  public void onReceive(Context context, Intent intent) { // 
-			getLoaderManager().restartLoader(0, null, timelineActivity);
-//			cursor = yamba.getStatusData().getStatusUpdates();
-//		    adapter.changeCursor(cursor);
+			getLoaderManager().restartLoader(1, null, timelineActivity);
+			/* use above loader manager to manage a cursor loader instead
+			cursor = yamba.getStatusData().getStatusUpdates();
+		    adapter.changeCursor(cursor);
 		    //cursor.requery(); // deprecated
-//			adapter.notifyDataSetChanged(); //
-		    Log.d("TimelineReceiver", "onReceived");
+			adapter.notifyDataSetChanged(); //
+			*/
+			Log.d("TimelineReceiver", "onReceived");
 		  }
 	  }
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		// This is called when a new Loader needs to be created.
 		// We have only one Loader, so we don't care about the ID.
+		// First, pick the base URI to use
 		Uri baseUri = StatusProvider.CONTENT_URI;
-		// Now create and return a CursorLoader that will take care of
 
+		// Now create and return a CursorLoader that will take care of
 		// creating a Cursor for the data being displayed.
 		return new CursorLoader(this, baseUri,
 				null, null, null,
@@ -184,9 +192,6 @@ public class TimelineActivity extends BaseActivity
 		// Swap the new cursor in. (The framework will take care of closing the
 		// old cursor once we return.)
 		adapter.swapCursor(data);
-
-		// The list should now be shown.
-		adapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -194,7 +199,7 @@ public class TimelineActivity extends BaseActivity
 		// This is called when the last Cursor provided to onLoadFinished()
 		// above is about to be closed. We need to make sure we are no
 		// longer using it.
-		adapter.swapCursor(null);
+		adapter.swapCursor(null); // swap in a null cursor to release the old cursor
 	}
 }
 
